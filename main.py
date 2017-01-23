@@ -30,4 +30,4 @@ sock.bind(("localhost",20039));
 
 newsock,_ = sock.accept();
 
-newsock.send(
+
