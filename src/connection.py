@@ -32,11 +32,9 @@ class Connection(threading.Thread):
         # Initialize queue lock
         self.messageLock = threading.RLock();
 
-        # Initialize service thread
-        self.thread = threading.Thread(target=self.handler);
 
         # Initialize RSA public key
-        self.key = key
+        self.key = key;
 
     def add_message(self, message):
         # Adds a message to the message queue. Will send after all prior
@@ -46,5 +44,12 @@ class Connection(threading.Thread):
         with self.messageLock:
             self.messageQueue.append(message);
             
-    def handler(self):
-        
+    def run(self):
+        # Implement listener
+
+        # TODO: implement.
+
+        pass;
+
+        #while True:
+        #    data = self.client.recv();
