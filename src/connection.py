@@ -15,7 +15,7 @@ import threading;
 # End system imports
 
 # Begin class
-class Connection(object):
+class Connection(threading.Thread):
     # Connection -- Maintains and manages connections with client classes.
     # Runs a thread for each client.
 
@@ -40,11 +40,11 @@ class Connection(object):
 
     def add_message(self, message):
         # Adds a message to the message queue. Will send after all prior
-        # messages have been sent
+        # messages have been sent.
 
         # Aquire lock and add message
         with self.messageLock:
             self.messageQueue.append(message);
-
-        
+            
+    def handler(self):
         
