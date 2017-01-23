@@ -14,6 +14,10 @@ import socket;
 import threading;
 # End system imports
 
+# Begin local imports
+import connection;
+# End local imports
+
 # Begin class
 class ChatdServer(object):
     # ChatdServer -- Manage chat threads and socket objects to facilitate
