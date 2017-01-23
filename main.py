@@ -17,6 +17,17 @@ import os;
 # End module imports
 
 # Begin user imports
-import src.server
+#import src.RequestHandler
+# End user imports
 
-# Begin functions
+# main
+
+# Create socket
+sock = socket.socket();
+
+# Bind socket to localhost port 
+sock.bind(("localhost",20039));
+
+newsock,_ = sock.accept();
+
+newsock.send(
