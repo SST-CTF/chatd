@@ -24,6 +24,37 @@ Coming soon.
 How to install and run the service, coming soon.
 
 
+## Connecting to this server
+The SST CTF chatd service is designed to be extensible and can work with many different
+client implementations. However, there are some requirements to effectively communicate
+with the server.
+
+#### Handshake
+The handshake with the server (initial connection) begins with the client sending a 
+username, immediately followed by a public key. The server will then respond with its
+own public key. Currently no encryption is available, and this spec will change when
+the beta is released to include encryption.
+
+#### Message Transmission
+The format for message transmission is JSON-encoded strings, specifically JSON objects
+(more commonly known as maps or dictionaries).
+The server requires a message field, which contains the user's messsage. The specifications
+for standard communications also require the following:
+
+| Key           | Data Type | Use                  |
+|---------------|-----------|----------------------|
+| `user`        | `string`  | Name of sender       |
+| `message`     | `string`  | Message to display   |
+| `color`       | `int`  | The user's preferred color. This should be a `curses` color code (0-7). |
+
+Anything specified here *must* be sent by your client and can be expected to exist. You need
+not concern yourself with checking for the existence of these fields because they are required
+for the proper function of the client.
+
+You may declare further data fields in your implementation, however you *must* check that they exist
+because other clients likely will not implement them. These can be used to add useful functionality
+such as nicknames, message formatting, and other message-specific signals.
+
 ## Footnotes
 ###### Links
 [Link to this GitHub page.](https://github.com/SST-CTF/chatd)
