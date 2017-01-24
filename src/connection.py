@@ -12,44 +12,80 @@
 # Begin system imports
 import socket;
 import threading;
+import json;
 # End system imports
+
+# Begin local imports
+import src.crypt;
+# End local imports
+
+# Static vars
+QUIT_MSGS = [
+    ":q",
+    ":d",
+    ":quit",
+    ":disconnect"
+];
 
 # Begin class
 class Connection(threading.Thread):
     # Connection -- Maintains and manages connections with client classes.
     # Runs a thread for each client.
 
-    def __init__(self, client, key):
+    def __init__(self, client, user, key, server):
         # Connection(client) takes a client socket and an RSA public key
         # and returns a Connection object
 
         # Save client so we can communicate with it later
         self.client = client;
 
-        # Initialize message queue
-        self.messageQueue = [];
-
-        # Initialize queue lock
-        self.messageLock = threading.RLock();
-
+        # Save username so we can utilize it later
+        self.user = user
 
         # Initialize RSA public key
         self.key = key;
 
-    def add_message(self, message):
-        # Adds a message to the message queue. Will send after all prior
-        # messages have been sent.
+        # Save server obj for reference
+        self.serv = server;
 
-        # Aquire lock and add message
-        with self.messageLock:
-            self.messageQueue.append(message);
-            
-    def run(self):
+        # Run super.init
+        threading.Thread.__init__(self);
+
+     def run(self):
         # Implement listener
 
-        # TODO: implement.
+        jsonDecoder = json.JSONDecoder();
 
-        pass;
+        while True:
+            # Block until data received
+            data = self.client.recv(4096);
 
-        #while True:
-        #    data = self.client.recv();
+            # Decrypt
+            data = crypt.decrypt(data);
+
+            # When received, decode into JSON string
+            jsonCode = data.decode('utf-8');
+
+            # Decode JSON string into dictionary
+            contents = jsonDecoder.decode(jsonCode);
+            
+            # First, check to see if message is a quit command
+            if contents['message'] in QUIT_MSGS:
+                # If so, break the loop.
+                break;
+
+            self.serv.send_message(contents);
+
+        # End loop
+
+        # Close connection
+        self.client.close();
+
+    def send_message(self, message):
+        # Sends `message`, a JSON string, to the client.
+
+        # Encrypt
+        message = crypt.encrypt(message);
+
+        # Send encrypted message
+        self.client.sendall(message);

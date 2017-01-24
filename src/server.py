@@ -15,7 +15,8 @@ import threading;
 # End system imports
 
 # Begin local imports
-from src.connection import Connection as Client
+from src.connection import Connection as Client;
+from src.queue import Queue as MessageQueue;
 # End local imports
 
 # Begin class
@@ -29,11 +30,33 @@ class ChatdServer(object):
         # Initialize server socket
         self.serverSocket = socket.socket();
 
+        # Initialize client list
+        self.clients = [];
+
+        # Initialize client list lock
+        self.clientLock = threading.RLock();
+
+        # Initialize global message queue
+        self.globalMessageQueue = MessageQueue();
+
     def bind(self, port):
         # Binds server socket to all interfaces on given port. Expects UInt16.
 
         # Bind server to all interfaces
         self.serverSocket.bind(("0.0.0.0",port));
+
+    def send_message(self, message):
+        # Sends `message` to all connected clients.
+
+        # Lock client list so we can safely iterate.
+        with self.clientLock:
+            # Begin iterating over the client list
+            for client in self.clients:
+                # Make sure client is alive before sending so we don't trigger
+                # an exception
+                if client.is_alive():
+                    # Send message
+                    client.send_message(message);
 
     def start(self):
         # Begins listening for requests. Does not return.
@@ -58,6 +81,13 @@ class ChatdServer(object):
             # Debug print statements
             print(uname,pubkey);
 
+            # Check for user's existence
+            if uname == "" or not os.path.isdir("/home/" + uname + "/"):
+                # If user doesn't exist, close the connection and continue
+                client.send("Err: user not found\0".encode("utf-8"));
+                client.close();
+                continue;
+
             # Compare to user's authorized_keys
             with open("/home/" + uname + "/.ssh/authorized_keys",'r') as authKeys:
                 # Store contents
@@ -75,8 +105,15 @@ class ChatdServer(object):
                     client.send(serverKey.read().encode("utf-8"));
 
                 # Create handler class and hand off connection management
-                handler = Client(client, pubkey);
+                handler = Client(client, uname, pubkey, self);
+
+                # Add new handler to client list
+                with self.clientLock:
+                    self.clients.append(handler);
+
+                # Run handler thread
                 handler.start();
+                    
 
         # End listen loop
 
