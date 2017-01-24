@@ -10,24 +10,17 @@
 # This file contains the startup for the server.
 #
 
-# Begin module imports
-import socket;
-import sys;
-import os;
-# End module imports
-
 # Begin user imports
-#import src.RequestHandler
+from src.server import ChatdServer as Server
 # End user imports
 
 # main
 
-# Create socket
-sock = socket.socket();
+# Initialize the server
+serv = Server();
 
-# Bind socket to localhost port 
-sock.bind(("localhost",20039));
+# Bind the server
+serv.bind(10001);
 
-newsock,_ = sock.accept();
-
-
+# Start the server
+serv.start();
