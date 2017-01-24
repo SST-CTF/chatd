@@ -26,7 +26,7 @@ from src.server import ChatdServer as Server
 serv = Server();
 
 # Bind the server
-serv.bind(10000);
+serv.bind(10001);
 
 # Start the server
 serv.start();

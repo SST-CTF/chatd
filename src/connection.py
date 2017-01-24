@@ -17,6 +17,7 @@ import json;
 
 # Begin local imports
 import src.crypt;
+from src.sender import Sender;
 # End local imports
 
 # Static vars
@@ -48,10 +49,14 @@ class Connection(threading.Thread):
         # Save server obj for reference
         self.serv = server;
 
+        # Create helper thread for message transmission, so the receiver doesn't
+        # block while waiting to send
+        self.sender = Sender(self.serv);
+
         # Run super.init
         threading.Thread.__init__(self);
 
-     def run(self):
+    def run(self):
         # Implement listener
 
         jsonDecoder = json.JSONDecoder();
@@ -61,7 +66,7 @@ class Connection(threading.Thread):
             data = self.client.recv(4096);
 
             # Decrypt
-            data = crypt.decrypt(data);
+            #data = crypt.decrypt(data);
 
             # When received, decode into JSON string
             jsonCode = data.decode('utf-8');
@@ -74,7 +79,8 @@ class Connection(threading.Thread):
                 # If so, break the loop.
                 break;
 
-            self.serv.send_message(contents);
+            self.sender = Sender(self.serv);
+            self.sender.send_message(jsonCode);
 
         # End loop
 
@@ -84,8 +90,11 @@ class Connection(threading.Thread):
     def send_message(self, message):
         # Sends `message`, a JSON string, to the client.
 
+        # Encode
+        encoded = message.encode('utf-8');
+        
         # Encrypt
-        message = crypt.encrypt(message);
+        #encoded = crypt.encrypt(encoded);
 
         # Send encrypted message
-        self.client.sendall(message);
+        self.client.sendall(encoded);
