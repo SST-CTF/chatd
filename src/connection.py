@@ -98,3 +98,8 @@ class Connection(threading.Thread):
 
         # Send encrypted message
         self.client.sendall(encoded);
+
+    def close_connection(self):
+        # Closes the connection
+
+        self.client.close();
