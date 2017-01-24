@@ -10,12 +10,6 @@
 # This file contains the startup for the server.
 #
 
-# Begin module imports
-import socket;
-import sys;
-import os;
-# End module imports
-
 # Begin user imports
 from src.server import ChatdServer as Server
 # End user imports

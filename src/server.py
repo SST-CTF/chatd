@@ -8,7 +8,6 @@
 # This file implements the `server` class for the chatd instant messaging system
 
 # Begin system imports
-import sys;
 import os;
 import socket;
 import threading;
