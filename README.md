@@ -46,6 +46,7 @@ for standard communications also require the following:
 | `user`        | `string`  | Name of sender       |
 | `message`     | `string`  | Message to display   |
 | `color`       | `int`  | The user's preferred color. This should be a `curses` color code (0-7). |
+| `channel` | `string` | The channel the message is sent on. Clients should have a channel subscribe function\* |
 
 Anything specified here *must* be sent by your client and can be expected to exist. You need
 not concern yourself with checking for the existence of these fields because they are required
@@ -54,6 +55,13 @@ for the proper function of the client.
 You may declare further data fields in your implementation, however you *must* check that they exist
 because other clients likely will not implement them. These can be used to add useful functionality
 such as nicknames, message formatting, and other message-specific signals.
+
+\* Channels are not server constructs. They are managed by the client. A user is always susbcribed
+to their PM channel, which is simply their username. These messages should be differentiated from
+standard messages (such as a dim 'from:' channel tag rather than the name of the channel). You may
+choose to implement a single-channel-only system or a multi-channel subscribe system, either is
+acceptable. However, note that the server does not log messages. If you wish to view all messages from
+a given channel, you should implement logging yourself.
 
 ## Footnotes
 ###### Links
